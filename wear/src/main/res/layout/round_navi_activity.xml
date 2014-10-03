@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MyActivity"
+    tools:deviceIds="wear_round">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="前方路口三萬公里左轉"
+        android:id="@+id/indicator_msg"
+        android:layout_gravity="center_horizontal|bottom"
+        android:maxLines="2" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/indicator_icon"
+        android:layout_gravity="center_horizontal|top"
+        android:src="@drawable/turn_right_128" />
+
+</FrameLayout>
