@@ -13,7 +13,7 @@
         android:text="前方路口三萬公里左轉"
         android:id="@+id/indicator_msg"
         android:layout_gravity="center_horizontal|bottom"
-        android:maxLines="2" />
+        android:maxLines="3" />
 
     <ImageView
         android:layout_width="wrap_content"

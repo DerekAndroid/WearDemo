@@ -67,7 +67,7 @@ public class WearActivity extends Activity implements WearableListView.ClickList
         mHandler.postDelayed(new Runnable(){
             @Override
             public void run() {
-                Function function = Functions.OPEN[id];
+                FunctionImp function = Functions.OPEN[id];
                 function.buildUI(mContext);
             }
         },100);

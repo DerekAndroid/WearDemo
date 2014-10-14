@@ -1,10 +1,15 @@
 package com.example.mm3.myapplication;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,7 +19,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
@@ -30,7 +34,7 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Random;
-
+import java.util.Date;
 
 public class MobileActivity extends Activity implements
         View.OnClickListener,
@@ -42,16 +46,11 @@ public class MobileActivity extends Activity implements
     private Context mContext = MobileActivity.this;
     private GoogleApiClient mGoogleApiClient;
     String TAG = "MobileActivity";
-    TextView randTextView;
+    TextView sendTextView;
+    TextView recvTextView;
     Button randButton;
     private static Bitmap bg;
-
-    static final String RAND_MSG = "前方 %d 公尺請\n%s ";
-    static final String mDirection[] = {
-      "左轉",
-      "直走",
-      "右轉"
-    };
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +94,8 @@ public class MobileActivity extends Activity implements
     @Override
     public void onContentChanged() {
         super.onContentChanged();
-        randTextView = (TextView) findViewById(R.id.rand_textView);
+        sendTextView = (TextView) findViewById(R.id.send_textView);
+        recvTextView = (TextView) findViewById(R.id.recv_textView);
         randButton = (Button) findViewById(R.id.rand_button);
     }
 
@@ -103,29 +103,90 @@ public class MobileActivity extends Activity implements
     public void onClick(View view) {
         switch(view.getId()){
             case R.id.rand_button:
-                int dist = new Random().nextInt(2000);
-                int dir = new Random().nextInt(3);
-                String msg = String.format(RAND_MSG, dist, mDirection[dir]);
-                randTextView.setText(msg);
+                HUD.Data data = geneData();
+                sendTextView.setText(data.toString());
 
-                // create and sync(send) data map
-
-                //創建PutDataMapRequest對象，為DataItem設置path值(建立請求以 '/' 開頭,區別不同的DataItem)
-                PutDataMapRequest mPutDataMapRequest = PutDataMapRequest.create(Constants.KEY_PATH);
-                // 通常在開發過程中是使用DataMap類實現DataItem接口，類似Bundle鍵值對的存儲方式
-                DataMap mDataMap = mPutDataMapRequest.getDataMap();
-                // 使用put…()方法為DataMap設置需要的數據
-                mDataMap.putString(Constants.KEY_MESSAGE, msg);
-                mDataMap.putInt(Constants.KEY_ICON_ID, dir);
-//                Asset asset = createAssetFromBitmap(bg);
-//                mDataMap.putAsset(Constants.KEY_ASSET, asset);
-                // 調用PutDataMapRequest.asPutDataRequest()創建PutDataRequest對象
-                PutDataRequest mPutDataRequest = mPutDataMapRequest.asPutDataRequest();
-                // 調用DataApi.putDataItem()請求系統創建DataItem
-                PendingResult<DataApi.DataItemResult> pendingResult =
-                        Wearable.DataApi.putDataItem(mGoogleApiClient, mPutDataRequest);
+                notifyWear(data);
+                //notifyMobile(data);
                 break;
         }
+    }
+
+    /********************************
+     * send notification to local
+     ********************************/
+    public static final int NOTIFICATION_ID = 0x7788;
+    public void notifyMobile(HUD.Data data){
+        // Prepare intent which is triggered if the
+        // notification is selected
+        Intent intent = new Intent(this, MobileActivity.class);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        HUD.ACTION action = HUD.ACTION.values()[data.direction - 1];
+
+        String longText = action.getString();
+        // Build notification
+        // Actions are just fake
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.common_signin_btn_text_focus_light);
+        Notification noti = new Notification.Builder(this)
+                .setLargeIcon(bm)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle(new Date().toGMTString())
+                .setContentText("Subject")
+                .setContentIntent(pIntent).setAutoCancel(true)
+                .addAction(R.drawable.ic_launcher, "Call", pIntent)
+                .addAction(R.drawable.ic_launcher, "More", pIntent)
+                .addAction(R.drawable.ic_launcher, "And more", pIntent)
+                .setStyle(new Notification.BigTextStyle().bigText(longText))
+                .build();
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        // Hide the notification after its selected
+
+        notificationManager.notify(NOTIFICATION_ID, noti);
+
+    }
+
+    /********************************
+     * create and sync(send) data map
+     ********************************/
+    public void notifyWear(HUD.Data data){
+        //創建PutDataMapRequest對象，為DataItem設置path值(建立請求以 '/' 開頭,區別不同的DataItem)
+        PutDataMapRequest mPutDataMapRequest = PutDataMapRequest.create(HUD.KEY_PATH);
+        // 通常在開發過程中是使用DataMap類實現DataItem接口，類似Bundle鍵值對的存儲方式
+        DataMap mDataMap = mPutDataMapRequest.getDataMap();
+        // 使用put…()方法為DataMap設置需要的數據
+        mDataMap.putInt(HUD.KEY_DIRECTION       , data.direction);
+        mDataMap.putInt(HUD.KEY_SPEED           , data.speed);
+        mDataMap.putInt(HUD.KEY_SPEED_LIMIT     , data.speed_limit);
+        mDataMap.putInt(HUD.KEY_DISTANCE        , data.distance);
+        mDataMap.putInt(HUD.KEY_INDICATOR       , data.indicator);
+        // 傳遞圖檔..etc
+        //Asset asset = createAssetFromBitmap(bg);
+        //mDataMap.putAsset(Constants.KEY_ASSET, asset);
+        // 調用PutDataMapRequest.asPutDataRequest()創建PutDataRequest對象
+        PutDataRequest mPutDataRequest = mPutDataMapRequest.asPutDataRequest();
+        // 調用DataApi.putDataItem()請求系統創建DataItem
+        Wearable.DataApi.putDataItem(mGoogleApiClient, mPutDataRequest);
+    }
+
+    public HUD.Data geneData(){
+        HUD.Data data = new HUD.Data();
+
+        int totalAction = HUD.ACTION.values().length;
+
+        int randAct = new Random().nextInt(totalAction);    // 隨機挑選認一轉向
+        int randDist = new Random().nextInt(14) * 50 + 300; // 隨機產生轉向距離
+        int randSpeed = new Random().nextInt(16) * 5 + 50;   // 隨機產生當前速度
+        int randSpeedLim = new Random().nextInt(6) * 10 + 70;// 隨機產生當前速度
+
+        // get direction from random action
+        HUD.ACTION action = HUD.ACTION.values()[randAct];
+        data.direction = action.getValue();
+        data.distance = randDist;
+        data.speed = randSpeed;
+        data.speed_limit = randSpeedLim;
+        data.indicator = new Random().nextInt(1);
+        System.out.print(data.toString());
+        return data;
     }
 
     private static Asset createAssetFromBitmap(Bitmap bitmap) {
@@ -173,9 +234,15 @@ public class MobileActivity extends Activity implements
     }
 
     @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
+    public void onMessageReceived(final MessageEvent messageEvent) {
         Log.i(TAG, "+ onMessageReceived");
         Log.i(TAG, "get: " + messageEvent.getPath());
+        mHandler.postDelayed(new Runnable(){
+            @Override
+            public void run() {
+                recvTextView.setText(messageEvent.getPath());
+            }
+        },100);
         Log.i(TAG, "- onMessageReceived");
     }
 

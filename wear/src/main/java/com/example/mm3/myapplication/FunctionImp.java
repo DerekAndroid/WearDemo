@@ -23,12 +23,12 @@ import android.util.Log;
 /**
  * Base class for notification preset generators.
  */
-public abstract class Function {
+public abstract class FunctionImp {
     public final String name;
 
-    public Function(String name) {
+    public FunctionImp(String name) {
         this.name = name;
-        Log.i("Function", name);
+        Log.i("FunctionImp", name);
     }
 
     /** Start buildin a full screen UI*/

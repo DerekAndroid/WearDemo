@@ -1,17 +1,17 @@
 package com.example.mm3.myapplication;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.data.FreezableUtils;
-import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
@@ -27,7 +27,8 @@ import java.util.concurrent.TimeUnit;
 public class WearService extends WearableListenerService {
     public static final String TAG = "WearService";
     private static Bitmap bg;
-
+    public static HUD.Data hud_data = null;
+    private Context context = WearService.this;
     public WearService() {
         Log.i(TAG, "+ WearService");
         Log.i(TAG, "- WearService");
@@ -39,41 +40,47 @@ public class WearService extends WearableListenerService {
         super.onCreate();
     }
 
-    private void buildNotification(
-        String title, String content, int icon_id, Asset asset, boolean withDismissal){
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                //.extend(new WearableExtender().setBackground(bg))
-                .setContentTitle(title)
-                .setContentText(content)
-                .addAction(R.drawable.generic_confirmation_00180,
-                        "GOGO!", null);
+    private void buildNotification(HUD.Data data , boolean withDismissal){
+        HUD.ACTION action = HUD.ACTION.values()[data.direction - 1];
+        // 參考 Notifications 範例
+        Notification.Builder builder = new Notification.Builder(context)
+                .setContentTitle(action.getString())
+                .setContentText(data.toString())
+                        // Set a content intent to return to this sample
+                .setContentIntent(PendingIntent.getActivity(context, 0,
+                        new Intent(context, WearActivity.class), 0))
+                .setSmallIcon(R.drawable.ic_launcher)    // 註解後不會顯示?
+                .extend(new Notification.WearableExtender()
+                        .setBackground(bg)
+                        .setHintHideIcon(true)  // 隱藏右上角圖示
+                        .setContentIcon(R.drawable.generic_confirmation_00180));
 
-        switch(icon_id){
-            case 0:
-                builder.setSmallIcon(R.drawable.turn_left_128);
-                //builder.extend(new NotificationCompat.WearableExtender().setContentIcon(R.drawable.turn_left_128));
-                break;
-            case 1:
-                builder.setSmallIcon(R.drawable.road_128);
-                //builder.extend(new WearableExtender().setContentIcon(R.drawable.road_128));
-                break;
-            case 2:
-                builder.setSmallIcon(R.drawable.turn_right_128);
-                //builder.extend(new WearableExtender().setContentIcon(R.drawable.turn_right_128));
-                break;
-        }
+//        switch(icon_id){
+//            case 0:
+//                builder.setSmallIcon(R.drawable.turn_left_128);
+//                //builder.extend(new NotificationCompat.WearableExtender().setContentIcon(R.drawable.turn_left_128));
+//                break;
+//            case 1:
+//                builder.setSmallIcon(R.drawable.road_128);
+//                //builder.extend(new WearableExtender().setContentIcon(R.drawable.road_128));
+//                break;
+//            case 2:
+//                builder.setSmallIcon(R.drawable.turn_right_128);
+//                //builder.extend(new WearableExtender().setContentIcon(R.drawable.turn_right_128));
+//                break;
+//        }
 
         if (withDismissal) {
             // 移除 Notification 的時候執行 PendingIntent
-            Intent dismissIntent = new Intent(Constants.ACTION_DISMISS);
-            dismissIntent.putExtra(Constants.KEY_NOTIFICATION_ID, Constants.NOTIFY_ID);
+            Intent dismissIntent = new Intent(HUD.ACTION_DISMISS);
+            dismissIntent.putExtra(HUD.KEY_NOTIFICATION_ID, HUD.NOTIFY_ID);
             PendingIntent pendingIntent = PendingIntent
                     .getService(this, 0, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setDeleteIntent(pendingIntent);
         }
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
-                .notify(Constants.NOTIFY_ID, builder.build());
+                .notify(HUD.NOTIFY_ID, builder.build());
     }
 
     @Override
@@ -96,14 +103,18 @@ public class WearService extends WearableListenerService {
 
         for (DataEvent event : events) {
             if (event.getType() == DataEvent.TYPE_CHANGED) {
-
                 DataItem dataItem = event.getDataItem();
+                // 通常在開發過程中是使用DataMap類實現DataItem接口，類似Bundle鍵值對的存儲方式
                 DataMap dataMap = DataMapItem.fromDataItem(dataItem).getDataMap();
-                String msg = dataMap.getString(Constants.KEY_MESSAGE);
-                int icon_id = dataMap.getInt(Constants.KEY_ICON_ID);
-                Asset asset = dataMap.getAsset(Constants.KEY_ASSET);
-                Log.i(TAG, "Get: " + icon_id + "/" + msg);
-                buildNotification("Attention!", msg, icon_id, asset, true);
+                HUD.Data data = new HUD.Data();
+                data.direction      =  dataMap.getInt(HUD.KEY_DIRECTION);
+                data.speed          =  dataMap.getInt(HUD.KEY_SPEED);
+                data.speed_limit    =  dataMap.getInt(HUD.KEY_SPEED_LIMIT);
+                data.distance       =  dataMap.getInt(HUD.KEY_DISTANCE);
+                data.indicator      =  dataMap.getInt(HUD.KEY_INDICATOR);
+                hud_data = data;
+                Log.i(TAG, data.toString());
+                buildNotification(data , true);
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
                 Log.i(TAG, "DataEvent.TYPE_DELETED");
             }

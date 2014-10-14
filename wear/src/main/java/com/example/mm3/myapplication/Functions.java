@@ -15,7 +15,7 @@ public class Functions {
             "AUX" , "AM/FM", "USB MP3", "BT Audio", "Navi", "Mode"};
 
     // create UI
-    public static final Function[] OPEN = new Function[] {
+    public static final FunctionImp[] OPEN = new FunctionImp[] {
             new AuxOperation(),
             new RadioOperation(),
             new MusicOperation(),
@@ -53,7 +53,7 @@ public class Functions {
     }
 
     //+ MUSIC
-    private static class MusicOperation extends Function {
+    private static class MusicOperation extends FunctionImp {
         public MusicOperation(){
             super("MusicOperation");
         }
@@ -76,7 +76,7 @@ public class Functions {
     //- MUSIC
 
     //+ Navi
-    private static class NaviOperation extends Function {
+    private static class NaviOperation extends FunctionImp {
         public NaviOperation(){
             super("NaviOperation");
         }
@@ -98,7 +98,7 @@ public class Functions {
     }
     //- Navi
 
-    private static class AuxOperation extends Function {
+    private static class AuxOperation extends FunctionImp {
         public AuxOperation(){super("AuxOperation");}
 
         @Override
@@ -115,7 +115,7 @@ public class Functions {
         }
     }
 
-    private static class DialOperation extends Function {
+    private static class DialOperation extends FunctionImp {
         public DialOperation(){super("DialOperation");}
 
         @Override
@@ -133,7 +133,7 @@ public class Functions {
     }
 
 
-    private static class RadioOperation extends Function {
+    private static class RadioOperation extends FunctionImp {
         public RadioOperation(){super("RadioOperation");}
 
         @Override
@@ -150,7 +150,7 @@ public class Functions {
         }
     }
 
-    private static class BTMusicOperation extends Function {
+    private static class BTMusicOperation extends FunctionImp {
         public BTMusicOperation(){super("BTMusicOperation");}
 
         @Override
@@ -167,7 +167,7 @@ public class Functions {
         }
     }
 
-    private static class ModeOperation extends Function {
+    private static class ModeOperation extends FunctionImp {
         public ModeOperation(){super("ModeOperation");}
 
         @Override

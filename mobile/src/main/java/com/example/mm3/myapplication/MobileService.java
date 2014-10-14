@@ -32,7 +32,9 @@ public class MobileService extends WearableListenerService implements RCInterfac
         super.onCreate();
         //RCInterfaceReceiver
         mRCInterfaceReceiver = new RCInterfaceReceiver(this, this);
-        RCInterfaceReceiver.req_enable(MobileService.this, true);//enable
+        //get init.
+        RCInterfaceReceiver.req_enable(MobileService.this, true);//enable this interface with RC.
+        RCInterfaceReceiver.req_alive(MobileService.this);//check if "RPC to 2-Din" is alive.
         Log.i(TAG, "+ onCreate");
     }
 
@@ -102,34 +104,71 @@ public class MobileService extends WearableListenerService implements RCInterfac
     }
 
     //+F1 INTERFACE
-    @Override
     public void notifyServiceReady(boolean bReady) {
+        Log.i(TAG, "+ notifyServiceReady");
+        Log.i(TAG, "- notifyServiceReady");
+    }
 
+    @Override
+    public void notifyServiceReady(boolean bReady, boolean bRPCisWork, int version) {
+        Log.i(TAG, "+ notifyServiceReady");
+        Log.d(TAG, String.format("REDY: %b , RPC: %b , VER: %d",
+                bReady, bRPCisWork, version));
+        Log.i(TAG, "- notifyServiceReady");
+    }
+
+    @Override
+    public void notifyTPMS(int id, int pressure, int tempture, int noSignal, int status, int leakGas) {
+        Log.i(TAG, "+ notifyTPMS");
+        Log.d(TAG, String.format("ID: %d , PRES: %d , TEMP: %d , NOSI: %d , STAT: %d , LEGA: %d",
+                id, pressure, tempture, noSignal, status, leakGas));
+        Log.i(TAG, "- notifyTPMS");
+    }
+
+    @Override
+    public int notifyAllTPMS(int[] pressure, int[] tempture, int[] noSignal, int[] status, int[] leakGas) {
+        Log.i(TAG, "+ notifyAllTPMS");
+        Log.i(TAG, "- notifyAllTPMS");
+        return 0;
     }
 
     @Override
     public void ack_enable(boolean bEnable) {
-
+        Log.i(TAG, "+ ack_enable");
+        Log.d(TAG, String.format("ENA: %b", bEnable));
+        Log.i(TAG, "- ack_enable");
     }
 
     @Override
     public void ack_alive(boolean bRPCisWork) {
-
+        Log.i(TAG, "+ ack_alive");
+        Log.d(TAG, String.format("RPC: %b", bRPCisWork));
+        Log.i(TAG, "- ack_alive");
     }
 
     @Override
     public void ack_getSysInf(String[] sysInf) {
-
+        Log.i(TAG, "+ ack_getSysInf");
+        Log.i(TAG, "- ack_getSysInf");
     }
 
     @Override
     public void ack_doShellCmd(String origCmd, String result) {
-
+        Log.i(TAG, "+ ack_doShellCmd");
+        Log.i(TAG, "- ack_doShellCmd");
     }
 
     @Override
     public void notifyHUD(int direction, int DrvDistance, int DrvSpeed, int speedLimit, int speedCamera) {
-
+        Log.i(TAG, "+ notifyHUD");
+        HUD.Data data = new HUD.Data();
+        data.direction = direction;
+        data.distance = DrvDistance;
+        data.speed = DrvSpeed;
+        data.speed_limit = speedLimit;
+        data.indicator = speedCamera;
+        System.out.print(data.toString());
+        Log.i(TAG, "- notifyHUD");
     }
     //-F1 INTERFACE
 }

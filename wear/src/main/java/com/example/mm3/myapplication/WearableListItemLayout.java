@@ -72,19 +72,26 @@ public class WearableListItemLayout extends LinearLayout implements WearableList
 
     @Override
     public void setScalingAnimatorValue(float scale) {
+        // 設定選中的縮放比例
         mScale = scale;
+        // 圖示縮放
         mCircle.setScaleX(scale);
         mCircle.setScaleY(scale);
+        // 文字縮放
+        mName.setScaleX(scale);
+        mName.setScaleY(scale);
     }
 
     @Override
     public void onScaleUpStart() {
+        // 設定取得 focus 狀態
         mName.setAlpha(1f);
         ((GradientDrawable) mCircle.getDrawable()).setColor(mChosenCircleColor);
     }
 
     @Override
     public void onScaleDownStart() {
+        // 設定離開 focus 狀態
         ((GradientDrawable) mCircle.getDrawable()).setColor(mFadedCircleColor);
         mName.setAlpha(mFadedTextAlpha);
     }

@@ -9,9 +9,4 @@ public class Constants {
     public static final String KEY_ICON_ID = "icon_id";
     public static final String KEY_ASSET = "asset";
 
-    // execute command
-    public static final int CMD_PREV = 0x0001;
-    public static final int CMD_NEXT = 0x0002;
-    public static final int CMD_PLAY_PAUSE = 0x0003;
-    public static final int CMD_MUTE = 0x0004;
 }

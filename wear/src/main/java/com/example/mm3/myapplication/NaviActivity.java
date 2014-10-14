@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.data.FreezableUtils;
-import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
@@ -68,6 +67,7 @@ public class NaviActivity extends Activity implements
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
                 setupWidgets();
+                init();
             }
         });
 
@@ -76,6 +76,11 @@ public class NaviActivity extends Activity implements
     private void setupWidgets(){
         mIcon = (ImageView) findViewById(R.id.indicator_icon);
         mMsg = (TextView) findViewById(R.id.indicator_msg);
+    }
+
+    private void init(){
+        if(WearService.hud_data != null)
+            mHandler.post(new UpdateWidgetsRunnable(WearService.hud_data));
     }
 
     @Override
@@ -126,11 +131,14 @@ public class NaviActivity extends Activity implements
 
                 DataItem dataItem = event.getDataItem();
                 DataMap dataMap = DataMapItem.fromDataItem(dataItem).getDataMap();
-                String msg = dataMap.getString(Constants.KEY_MESSAGE);
-                int icon_id = dataMap.getInt(Constants.KEY_ICON_ID);
-                Asset asset = dataMap.getAsset(Constants.KEY_ASSET);
-                Log.i(TAG, "Get: " + icon_id + "/" + msg);
-                mHandler.post(new UpdateWidgetsRunnable(msg, icon_id));
+                HUD.Data data = new HUD.Data();
+                data.direction      =  dataMap.getInt(HUD.KEY_DIRECTION);
+                data.speed          =  dataMap.getInt(HUD.KEY_SPEED);
+                data.speed_limit    =  dataMap.getInt(HUD.KEY_SPEED_LIMIT);
+                data.distance       =  dataMap.getInt(HUD.KEY_DISTANCE);
+                data.indicator      =  dataMap.getInt(HUD.KEY_INDICATOR);
+                Log.i(TAG, data.toString());
+                mHandler.post(new UpdateWidgetsRunnable(data));
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
                 Log.i(TAG, "DataEvent.TYPE_DELETED");
             }
@@ -141,26 +149,24 @@ public class NaviActivity extends Activity implements
     }
 
     class UpdateWidgetsRunnable implements Runnable{
-        String msg;
-        int icon_id;
-        public UpdateWidgetsRunnable(String msg, int icon_id){
-            this.msg = msg;
-            this.icon_id = icon_id;
+        HUD.Data data;
+        public UpdateWidgetsRunnable(HUD.Data data){
+            this.data = data;
         }
         @Override
         public void run() {
-            mMsg.setText(msg);
-            switch(icon_id){
-                case 0:
-                    mIcon.setImageResource(R.drawable.turn_left_128);
-                    break;
-                case 1:
-                    mIcon.setImageResource(R.drawable.road_128);
-                    break;
-                case 2:
-                    mIcon.setImageResource(R.drawable.turn_right_128);
-                    break;
-            }
+            mMsg.setText(data.toString());
+//            switch(icon_id){
+//                case 0:
+//                    mIcon.setImageResource(R.drawable.turn_left_128);
+//                    break;
+//                case 1:
+//                    mIcon.setImageResource(R.drawable.road_128);
+//                    break;
+//                case 2:
+//                    mIcon.setImageResource(R.drawable.turn_right_128);
+//                    break;
+//            }
         }
     }
 
