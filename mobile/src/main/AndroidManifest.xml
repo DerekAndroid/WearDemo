@@ -19,11 +19,21 @@
             </intent-filter>
         </activity>
 
+        <!-- WearableListenerService 同步大約8秒後就會被 GC -->
+        <!--
         <service
-            android:name=".MobileService" >
+            android:enabled="true"
+            android:name=".MobileWearService" >
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
+        </service>
+        -->
+
+        <service
+            android:enabled="true"
+            android:exported="true"
+            android:name=".MobileService" >
         </service>
     </application>
 

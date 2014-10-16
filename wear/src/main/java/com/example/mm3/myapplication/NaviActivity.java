@@ -36,6 +36,7 @@ public class NaviActivity extends Activity implements
         NodeApi.NodeListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
+    private static final boolean D = false;
     public static final String TAG = "NaviActivity";
     public final Context mContext = NaviActivity.this;
     // client
@@ -47,6 +48,7 @@ public class NaviActivity extends Activity implements
 
     // handler
     private Handler mHandler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +77,7 @@ public class NaviActivity extends Activity implements
 
     private void setupWidgets(){
         mIcon = (ImageView) findViewById(R.id.indicator_icon);
+        mIcon.setVisibility(View.GONE);
         mMsg = (TextView) findViewById(R.id.indicator_msg);
     }
 
@@ -111,7 +114,7 @@ public class NaviActivity extends Activity implements
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
-        Log.i(TAG, "+ onDataChanged");
+        if(D)Log.i(TAG, "+ onDataChanged");
         final List<DataEvent> events = FreezableUtils.freezeIterable(dataEvents);
         dataEvents.close();
 
@@ -122,7 +125,7 @@ public class NaviActivity extends Activity implements
         ConnectionResult connectionResult = googleApiClient.blockingConnect(100,
                 TimeUnit.MILLISECONDS);
         if (!connectionResult.isSuccess()) {
-            Log.e(TAG, "Service failed to connect to GoogleApiClient.");
+            if(D)Log.e(TAG, "Service failed to connect to GoogleApiClient.");
             return;
         }
 
@@ -137,15 +140,19 @@ public class NaviActivity extends Activity implements
                 data.speed_limit    =  dataMap.getInt(HUD.KEY_SPEED_LIMIT);
                 data.distance       =  dataMap.getInt(HUD.KEY_DISTANCE);
                 data.indicator      =  dataMap.getInt(HUD.KEY_INDICATOR);
+<<<<<<< HEAD
                 Log.i(TAG, data.toString());
+=======
+                //if(D)Log.i(TAG, data.toString());
+>>>>>>> Android Wear SDK 0.8.9
                 mHandler.post(new UpdateWidgetsRunnable(data));
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
-                Log.i(TAG, "DataEvent.TYPE_DELETED");
+                if(D)Log.i(TAG, "DataEvent.TYPE_DELETED");
             }
         }
 
         googleApiClient.disconnect();
-        Log.i(TAG, "- onDataChanged");
+        if(D)Log.i(TAG, "- onDataChanged");
     }
 
     class UpdateWidgetsRunnable implements Runnable{
@@ -192,12 +199,12 @@ public class NaviActivity extends Activity implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.i(TAG, "+ onConnected: " + bundle);
+        if(D)Log.i(TAG, "+ onConnected: " + bundle);
         // Now you can use the data layer API
         Wearable.DataApi.addListener(mGoogleApiClient, this);
         Wearable.MessageApi.addListener(mGoogleApiClient, this);
         Wearable.NodeApi.addListener(mGoogleApiClient, this);
-        Log.i(TAG, "- onConnected");
+        if(D)Log.i(TAG, "- onConnected");
     }
 
     @Override

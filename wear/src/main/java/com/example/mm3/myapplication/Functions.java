@@ -24,8 +24,9 @@ public class Functions {
             new ModeOperation(),
     };
 
-    public static int getModeKeyCode(int id){
-        switch(id){
+    // item pos map to panelKey
+    public static int getModeKeyCode(int pos){
+        switch(pos){
             case 0:
                 return PanelKeyEvent.PanelKey_AuxIn;
             case 1:

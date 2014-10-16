@@ -26,22 +26,35 @@ import java.util.concurrent.TimeUnit;
 
 public class WearService extends WearableListenerService {
     public static final String TAG = "WearService";
+    private static final boolean D = false;
     private static Bitmap bg;
     public static HUD.Data hud_data = null;
     private Context context = WearService.this;
+<<<<<<< HEAD
+=======
+
+>>>>>>> Android Wear SDK 0.8.9
     public WearService() {
-        Log.i(TAG, "+ WearService");
-        Log.i(TAG, "- WearService");
+        if(D)Log.i(TAG, "+ WearService");
+        if(D)Log.i(TAG, "- WearService");
     }
 
     @Override
     public void onCreate() {
         bg = BitmapFactory.decodeResource(getResources(), R.drawable.notification_bg);
+        hud_data = new HUD.Data();
         super.onCreate();
     }
 
     private void buildNotification(HUD.Data data , boolean withDismissal){
+<<<<<<< HEAD
         HUD.ACTION action = HUD.ACTION.values()[data.direction - 1];
+=======
+        if(D)Log.i(TAG, "+ buildNotification");
+        if(D)Log.i(TAG,data.toString());
+
+        HUD.ACTION action = HUD.getAction(data.direction);
+>>>>>>> Android Wear SDK 0.8.9
         // 參考 Notifications 範例
         Notification.Builder builder = new Notification.Builder(context)
                 .setContentTitle(action.getString())
@@ -81,12 +94,16 @@ public class WearService extends WearableListenerService {
 
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
                 .notify(HUD.NOTIFY_ID, builder.build());
+<<<<<<< HEAD
+=======
+        if(D)Log.i(TAG, "- buildNotification");
+>>>>>>> Android Wear SDK 0.8.9
     }
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents) {
         super.onDataChanged(dataEvents);
-        Log.i(TAG, "+ onDataChanged");
+        if(D)Log.i(TAG, "+ onDataChanged");
         final List<DataEvent> events = FreezableUtils.freezeIterable(dataEvents);
         dataEvents.close();
 
@@ -97,7 +114,7 @@ public class WearService extends WearableListenerService {
         ConnectionResult connectionResult = googleApiClient.blockingConnect(100,
                 TimeUnit.MILLISECONDS);
         if (!connectionResult.isSuccess()) {
-            Log.e(TAG, "Service failed to connect to GoogleApiClient.");
+            if(D)Log.e(TAG, "Service failed to connect to GoogleApiClient.");
             return;
         }
 
@@ -106,6 +123,7 @@ public class WearService extends WearableListenerService {
                 DataItem dataItem = event.getDataItem();
                 // 通常在開發過程中是使用DataMap類實現DataItem接口，類似Bundle鍵值對的存儲方式
                 DataMap dataMap = DataMapItem.fromDataItem(dataItem).getDataMap();
+<<<<<<< HEAD
                 HUD.Data data = new HUD.Data();
                 data.direction      =  dataMap.getInt(HUD.KEY_DIRECTION);
                 data.speed          =  dataMap.getInt(HUD.KEY_SPEED);
@@ -115,19 +133,27 @@ public class WearService extends WearableListenerService {
                 hud_data = data;
                 Log.i(TAG, data.toString());
                 buildNotification(data , true);
+=======
+                hud_data.direction      =  dataMap.getInt(HUD.KEY_DIRECTION);
+                hud_data.speed          =  dataMap.getInt(HUD.KEY_SPEED);
+                hud_data.speed_limit    =  dataMap.getInt(HUD.KEY_SPEED_LIMIT);
+                hud_data.distance       =  dataMap.getInt(HUD.KEY_DISTANCE);
+                hud_data.indicator      =  dataMap.getInt(HUD.KEY_INDICATOR);
+                buildNotification(hud_data , true);
+>>>>>>> Android Wear SDK 0.8.9
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
-                Log.i(TAG, "DataEvent.TYPE_DELETED");
+                if(D)Log.i(TAG, "DataEvent.TYPE_DELETED");
             }
         }
 
         googleApiClient.disconnect();
-        Log.i(TAG, "- onDataChanged");
+        if(D)Log.i(TAG, "- onDataChanged");
     }
 
     @Override
     public void onMessageReceived(MessageEvent messageEvent) {
         super.onMessageReceived(messageEvent);
-        Log.i(TAG, "+ onMessageReceived");
-        Log.i(TAG, "- onMessageReceived");
+        if(D)Log.i(TAG, "+ onMessageReceived");
+        if(D)Log.i(TAG, "- onMessageReceived");
     }
 }

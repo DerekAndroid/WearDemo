@@ -12,8 +12,12 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="前方路口三萬公里左轉"
         android:id="@+id/indicator_msg"
+<<<<<<< HEAD
         android:layout_gravity="center_horizontal|bottom"
         android:maxLines="3" />
+=======
+        android:layout_gravity="left|top"/>
+>>>>>>> Android Wear SDK 0.8.9
 
     <ImageView
         android:layout_width="wrap_content"

@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,8 +6,10 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
     tools:context=".MyActivity">
 
+<<<<<<< HEAD
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -57,3 +59,72 @@
         android:layout_alignEnd="@+id/send_textView" />
 
 </RelativeLayout>
+=======
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send HUD Data"
+            android:id="@+id/rand_hud_button"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send TPMS data"
+            android:id="@+id/rand_tpms_button" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Send:"
+            android:id="@+id/textView"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="--------"
+            android:id="@+id/send_textView"
+            android:ellipsize="marquee"
+            android:gravity="left"
+            android:singleLine="false"
+            android:layout_alignTop="@+id/textView"
+            android:layout_toEndOf="@+id/textView" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Receive:"
+            android:id="@+id/textView2"
+            android:layout_below="@+id/send_textView"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="--------"
+            android:id="@+id/recv_textView"
+            android:layout_below="@+id/send_textView"
+            android:layout_toEndOf="@+id/textView2"
+            android:layout_alignEnd="@+id/send_textView" />
+    </LinearLayout>
+
+</LinearLayout>
+>>>>>>> Android Wear SDK 0.8.9

@@ -4,6 +4,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
@@ -18,6 +21,7 @@ public class GoogleClient {
     public static final String TAG = "GoogleClient";
     private GoogleApiClient client;
     private static final long CONNECTION_TIME_OUT_MS = 100;
+    private static final String KEY_START_TIME = "KEY_START_TIME";
     private String nodeId;
 
     GoogleClient(Context context){
@@ -30,12 +34,33 @@ public class GoogleClient {
      */
     public void sendCommand(final int command){
         Log.i(TAG, "+ sendCommand: " + command);
+
+        //檢查是否有連線節點
         if (nodeId != null) {
+            //紀錄傳送時間
+            DataMap dataMap = new DataMap();
+            dataMap.putLong(KEY_START_TIME, System.currentTimeMillis());
+
+            //避免ANR
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     client.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-                    Wearable.MessageApi.sendMessage(client, nodeId, String.valueOf(command), null);
+                    Wearable.MessageApi.sendMessage(client, nodeId, String.valueOf(command), null)
+                        .setResultCallback(
+                        //檢查是否傳遞成功
+                        new ResultCallback<MessageApi.SendMessageResult>(){
+                            @Override
+                            public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                                if(!sendMessageResult.getStatus().isSuccess()){
+                                    Log.e(TAG, "Failed to send message with status code:"
+                                    + sendMessageResult.getStatus().getStatusCode());
+                                }else{
+                                    Log.i(TAG, "+ sendCommand: " + command);
+                                }
+                            }
+                        }
+                    );
                     //同步單一欄位,資料沒有變更將不會更新
                     /*
                     //創建PutDataMapRequest對象，為DataItem設置path值(建立請求以 '/' 開頭,區別不同的DataItem)
@@ -55,6 +80,7 @@ public class GoogleClient {
             }).start();
         }else{
             Log.e(TAG,"Can't get Node Id!");
+            retrieveDeviceNode();
         }
         Log.i(TAG, "- sendCommand: " + command);
     }
@@ -94,7 +120,14 @@ public class GoogleClient {
                 NodeApi.GetConnectedNodesResult result =
                         Wearable.NodeApi.getConnectedNodes(client).await();
                 List<Node> nodes = result.getNodes();
+                if(nodes == null){
+                    Log.e(TAG, "Nodes not found...");
+                    return;
+                }
                 if (nodes.size() > 0) {
+                    for(int i = 0 ; i < nodes.size() ; i++){
+                        Log.d(TAG, "Get " + i + " : " + nodes.get(0).getId());
+                    }
                     nodeId = nodes.get(0).getId();
                 }
                 client.disconnect();

@@ -19,6 +19,11 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+<<<<<<< HEAD
+=======
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+>>>>>>> Android Wear SDK 0.8.9
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
@@ -33,7 +38,10 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.ByteArrayOutputStream;
+<<<<<<< HEAD
 import java.util.Random;
+=======
+>>>>>>> Android Wear SDK 0.8.9
 import java.util.Date;
 
 public class MobileActivity extends Activity implements
@@ -42,15 +50,26 @@ public class MobileActivity extends Activity implements
         MessageApi.MessageListener,
         NodeApi.NodeListener,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener{
+        GoogleApiClient.OnConnectionFailedListener,
+        RCInterfaceReceiver.FromRCInterface{
     private Context mContext = MobileActivity.this;
+    public RCInterfaceReceiver mRCInterfaceReceiver = null;
     private GoogleApiClient mGoogleApiClient;
     String TAG = "MobileActivity";
     TextView sendTextView;
     TextView recvTextView;
+<<<<<<< HEAD
     Button randButton;
     private static Bitmap bg;
     private Handler mHandler = new Handler();
+=======
+    Button randHudButton;
+    Button randTpmsButton;
+    private static Bitmap bg;
+    private Handler mHandler = new Handler();
+
+
+>>>>>>> Android Wear SDK 0.8.9
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +86,32 @@ public class MobileActivity extends Activity implements
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        randButton.setOnClickListener(this);
-
+        randHudButton.setOnClickListener(this);
+        randTpmsButton.setOnClickListener(this);
         bg = BitmapFactory.decodeResource(getResources(), R.drawable.notification_bg);
+
+//        //RCInterfaceReceiver
+//        mRCInterfaceReceiver = new RCInterfaceReceiver(this, this);
+//        //get init.
+//        RCInterfaceReceiver.req_enable(MobileActivity.this, true);//enable this interface with RC.
+//        RCInterfaceReceiver.req_alive(MobileActivity.this);//check if "RPC to 2-Din" is alive.
+
+        //啟動服務
+        Intent intent = new Intent(MobileActivity.this, MobileService.class);
+        startService(intent);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        //RCInterfaceReceiver
+//        if( mRCInterfaceReceiver != null ){
+//            RCInterfaceReceiver.req_enable(MobileActivity.this, false);//disable
+//            mRCInterfaceReceiver.Close();
+//            mRCInterfaceReceiver = null;
+//        }
+    }
+
 
     @Override
     protected void onStart() {
@@ -96,18 +137,34 @@ public class MobileActivity extends Activity implements
         super.onContentChanged();
         sendTextView = (TextView) findViewById(R.id.send_textView);
         recvTextView = (TextView) findViewById(R.id.recv_textView);
+<<<<<<< HEAD
         randButton = (Button) findViewById(R.id.rand_button);
+=======
+        randHudButton = (Button) findViewById(R.id.rand_hud_button);
+        randTpmsButton = (Button) findViewById(R.id.rand_tpms_button);
+>>>>>>> Android Wear SDK 0.8.9
     }
 
     @Override
     public void onClick(View view) {
         switch(view.getId()){
+<<<<<<< HEAD
             case R.id.rand_button:
                 HUD.Data data = geneData();
                 sendTextView.setText(data.toString());
 
                 notifyWear(data);
                 //notifyMobile(data);
+=======
+            case R.id.rand_hud_button:
+                HUD.Data data = HUD.Data.geneData();
+                sendTextView.setText(data.toString());
+                notifyWear(data);
+                //notifyMobile(data);
+                break;
+            case R.id.rand_tpms_button:
+
+>>>>>>> Android Wear SDK 0.8.9
                 break;
         }
     }
@@ -165,6 +222,7 @@ public class MobileActivity extends Activity implements
         // 調用PutDataMapRequest.asPutDataRequest()創建PutDataRequest對象
         PutDataRequest mPutDataRequest = mPutDataMapRequest.asPutDataRequest();
         // 調用DataApi.putDataItem()請求系統創建DataItem
+<<<<<<< HEAD
         Wearable.DataApi.putDataItem(mGoogleApiClient, mPutDataRequest);
     }
 
@@ -188,6 +246,23 @@ public class MobileActivity extends Activity implements
         System.out.print(data.toString());
         return data;
     }
+=======
+        PendingResult<DataApi.DataItemResult> result = Wearable.DataApi.putDataItem(mGoogleApiClient, mPutDataRequest);
+        result.setResultCallback(new ResultCallback<DataApi.DataItemResult>(){
+            @Override
+            public void onResult(DataApi.DataItemResult dataItemResult) {
+                if(!dataItemResult.getStatus().isSuccess()){
+                    Log.e(TAG, "Failed to send message with status code:"
+                            + dataItemResult.getStatus().getStatusCode());
+                }else{
+                    Log.i(TAG, "OK!");
+                }
+            }
+        });
+    }
+
+
+>>>>>>> Android Wear SDK 0.8.9
 
     private static Asset createAssetFromBitmap(Bitmap bitmap) {
         final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
@@ -279,4 +354,72 @@ public class MobileActivity extends Activity implements
         return super.onOptionsItemSelected(item);
     }
 
+
+    //+F1 INTERFACE
+    public void notifyServiceReady(boolean bReady) {
+        Log.i(TAG, "+ notifyServiceReady");
+        Log.i(TAG, "- notifyServiceReady");
+    }
+
+    @Override
+    public void notifyServiceReady(boolean bReady, boolean bRPCisWork, int version) {
+        Log.i(TAG, "+ notifyServiceReady");
+        Log.d(TAG, String.format("REDY: %b , RPC: %b , VER: %d",
+                bReady, bRPCisWork, version));
+        Log.i(TAG, "- notifyServiceReady");
+    }
+
+    @Override
+    public void notifyTPMS(int id, int pressure, int tempture, int noSignal, int status, int leakGas) {
+        Log.i(TAG, "+ notifyTPMS");
+        Log.d(TAG, String.format("ID: %d , PRES: %d , TEMP: %d , NOSI: %d , STAT: %d , LEGA: %d",
+                id, pressure, tempture, noSignal, status, leakGas));
+        Log.i(TAG, "- notifyTPMS");
+    }
+
+    @Override
+    public int notifyAllTPMS(int[] pressure, int[] tempture, int[] noSignal, int[] status, int[] leakGas) {
+        Log.i(TAG, "+ notifyAllTPMS");
+        Log.i(TAG, "- notifyAllTPMS");
+        return 0;
+    }
+
+    @Override
+    public void ack_enable(boolean bEnable) {
+        Log.i(TAG, "+ ack_enable");
+        Log.d(TAG, String.format("ENA: %b", bEnable));
+        Log.i(TAG, "- ack_enable");
+    }
+
+    @Override
+    public void ack_alive(boolean bRPCisWork) {
+        Log.i(TAG, "+ ack_alive");
+        Log.d(TAG, String.format("RPC: %b", bRPCisWork));
+        Log.i(TAG, "- ack_alive");
+    }
+
+    @Override
+    public void ack_getSysInf(String[] sysInf) {
+        Log.i(TAG, "+ ack_getSysInf");
+        Log.i(TAG, "- ack_getSysInf");
+    }
+
+    @Override
+    public void ack_doShellCmd(String origCmd, String result) {
+        Log.i(TAG, "+ ack_doShellCmd");
+        Log.i(TAG, "- ack_doShellCmd");
+    }
+
+    @Override
+    public void notifyHUD(int direction, int DrvDistance, int DrvSpeed, int speedLimit, int speedCamera) {
+        Log.i(TAG, "+ notifyHUD");
+        HUD.Data data = new HUD.Data();
+        data.direction = direction;
+        data.distance = DrvDistance;
+        data.speed = DrvSpeed;
+        data.speed_limit = speedLimit;
+        data.indicator = speedCamera;
+        Log.i(TAG, "- notifyHUD");
+    }
+    //-F1 INTERFACE
 }

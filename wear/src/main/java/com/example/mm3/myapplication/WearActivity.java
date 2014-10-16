@@ -59,15 +59,19 @@ public class WearActivity extends Activity implements WearableListView.ClickList
 
     }
 
-    public void buildOperation(final int id){
+    public void buildOperation(final int pos){
         // Notify Mode Change.
-        client.sendCommand(Functions.getModeKeyCode(id));
+        client.sendCommand(Functions.getModeKeyCode(pos));
         // Delay 100 ms to build UI
         // avoid another Activity establish connection lead to sendMessage fail.
         mHandler.postDelayed(new Runnable(){
             @Override
             public void run() {
+<<<<<<< HEAD
                 FunctionImp function = Functions.OPEN[id];
+=======
+                FunctionImp function = Functions.OPEN[pos];
+>>>>>>> Android Wear SDK 0.8.9
                 function.buildUI(mContext);
             }
         },100);

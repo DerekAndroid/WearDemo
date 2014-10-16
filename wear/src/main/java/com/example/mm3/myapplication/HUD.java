@@ -26,6 +26,18 @@ public final class HUD {
     // ACC
     public static final String KEY_ACC = "HUD_ACC";
 
+<<<<<<< HEAD
+=======
+    private static final int VALUE_TURN_LEFT                 = 0x303031;
+    private static final int VALUE_TURN_RIGHT                = 0x303032;
+    private static final int VALUE_TURN_UP_LEFT              = 0x303033;
+    private static final int VALUE_TURN_UP_RIGHT             = 0x303034;
+    private static final int VALUE_U_TURN_LEFT               = 0x303035;
+    private static final int VALUE_U_TURN_RIGHT              = 0x303036;
+    private static final int VALUE_GO_STRAIGHT               = 0x303037;
+    private static final int VALUE_CLEAR_DIRECTION_DISPLAY   = 0x232323;
+
+>>>>>>> Android Wear SDK 0.8.9
     public static class Data{
         public int direction;
         public int distance;
@@ -43,11 +55,19 @@ public final class HUD {
 
         public String toString(){
             return
+<<<<<<< HEAD
                     "Direct: " + direction +
                     "\nDistance: " + distance +
                     "\nSpeed: " + speed +
                     "\nSpeed_limit: " + speed_limit +
                     "\nIndicator: " + indicator +
+=======
+                    "Direct: " + getAction(direction).getString() +
+                    "\nDistance: " + distance +
+                    "\nSpeed: " + speed +
+                    "\nSpeed_limit: " + speed_limit +
+                    "\nIndicator: " + getIndicator(indicator) +
+>>>>>>> Android Wear SDK 0.8.9
                     "\n";
         }
     }
@@ -56,11 +76,50 @@ public final class HUD {
         void execute();
     }
 
+<<<<<<< HEAD
+=======
+    //hud value 轉換成 action
+    public static ACTION getAction(int direction){
+        switch(direction){
+            case VALUE_TURN_LEFT:
+                return ACTION.TURN_LEFT;
+            case VALUE_TURN_RIGHT:
+                return ACTION.TURN_RIGHT;
+            case VALUE_TURN_UP_LEFT:
+                return ACTION.TURN_UP_LEFT;
+            case VALUE_TURN_UP_RIGHT:
+                return ACTION.TURN_UP_RIGHT;
+            case VALUE_U_TURN_LEFT:
+                return ACTION.U_TURN_LEFT;
+            case VALUE_U_TURN_RIGHT:
+                return ACTION.U_TURN_RIGHT;
+            case VALUE_GO_STRAIGHT:
+                return ACTION.GO_STRAIGHT;
+            case VALUE_CLEAR_DIRECTION_DISPLAY:
+                return ACTION.CLEAR_DISPLAY;
+            default:
+                return null;
+        }
+    }
+
+    public static String getIndicator(int indicator){
+        switch(indicator) {
+            case 0x31:
+                return "限速照相";
+            case 0x30:
+                return "衝阿！";
+            default:
+                return "What the park?";
+        }
+    }
+
+>>>>>>> Android Wear SDK 0.8.9
     public static enum ACTION implements Command{
         /************************
          * Driving direction code
          ************************/
         // 建構列舉常數自訂序列與字串
+<<<<<<< HEAD
         TURN_LEFT(      "ACTION_TURN_LEFT"      , 0x0001),
         TURN_RIGHT(     "ACTION_TURN_RIGHT"     , 0x0002),
         TURN_UP_LEFT(   "ACTION_TURN_UP_LEFT"   , 0x0003),
@@ -69,6 +128,18 @@ public final class HUD {
         U_TURN_RIGHT(   "ACTION_U_TURN_RIGHT"   , 0x0006),
         GO_STRAIGHT(    "ACTION_GO_STRAIGHT"    , 0x0007),
         CLEAR_DISPLAY(  "ACTION_CLEAR_DISPLAY"  , 0x0008);
+=======
+        TURN_LEFT(      "ACTION_TURN_LEFT"      , VALUE_TURN_LEFT),
+        TURN_RIGHT(     "ACTION_TURN_RIGHT"     , VALUE_TURN_RIGHT),
+        TURN_UP_LEFT(   "ACTION_TURN_UP_LEFT"   , VALUE_TURN_UP_LEFT),
+        TURN_UP_RIGHT(  "ACTION_TURN_UP_RIGHT"  , VALUE_TURN_UP_RIGHT),
+        U_TURN_LEFT(    "ACTION_U_TURN_LEFT"    , VALUE_U_TURN_LEFT),
+        U_TURN_RIGHT(   "ACTION_U_TURN_RIGHT"   , VALUE_U_TURN_RIGHT),
+        GO_STRAIGHT(    "ACTION_GO_STRAIGHT"    , VALUE_GO_STRAIGHT),
+        CLEAR_DISPLAY(  "ACTION_CLEAR_DISPLAY"  , VALUE_CLEAR_DIRECTION_DISPLAY);
+
+
+>>>>>>> Android Wear SDK 0.8.9
 
         private int value;
         private String str;
@@ -118,6 +189,7 @@ public final class HUD {
     }
 
 
+<<<<<<< HEAD
 //    private static final int ACTION_TURN_LEFT                 = 0x0001;
 //    private static final int ACTION_TURN_RIGHT                = 0x0002;
 //    private static final int ACTION_TURN_UP_LEFT              = 0x0003;
@@ -126,6 +198,9 @@ public final class HUD {
 //    private static final int ACTION_U_TURN_RIGHT              = 0x0006;
 //    private static final int ACTION_GO_STRAIGHT               = 0x0007;
 //    private static final int ACTION_CLEAR_DIRECTION_DISPLAY   = 0x0008;
+=======
+
+>>>>>>> Android Wear SDK 0.8.9
 
 //    private static final String[] getString = {
 //            "Turn Left",
